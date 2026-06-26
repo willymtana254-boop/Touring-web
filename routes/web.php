@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\Admin\BookingAdminController;
 use App\Http\Controllers\PageController;
 
 /*
@@ -11,11 +11,12 @@ use App\Http\Controllers\PageController;
 |--------------------------------------------------------------------------
 */
 
+// Home
 Route::get('/', function () {
     return \Inertia\Inertia::render('home');
 })->name('home');
+
 // Public pages
-Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/destinations', [PageController::class, 'destinations'])->name('destinations');
 Route::get('/destinations/{slug}', [PageController::class, 'destination'])->name('destination.show');
 Route::get('/transport-fares', [PageController::class, 'transport'])->name('transport');
@@ -26,3 +27,11 @@ Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::get('/book', [BookingController::class, 'create'])->name('booking.create');
 Route::post('/book', [BookingController::class, 'store'])->name('booking.store');
 Route::get('/book/confirmation/{reference}', [BookingController::class, 'confirmation'])->name('booking.confirmation');
+
+// Admin panel (protected by auth)
+Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/bookings', [BookingAdminController::class, 'index'])->name('bookings.index');
+    Route::patch('/bookings/{booking}/status', [BookingAdminController::class, 'updateStatus'])->name('bookings.status');
+    Route::delete('/bookings/{booking}', [BookingAdminController::class, 'destroy'])->name('bookings.destroy');
+    Route::get('/bookings/export', [BookingAdminController::class, 'export'])->name('bookings.export');
+});

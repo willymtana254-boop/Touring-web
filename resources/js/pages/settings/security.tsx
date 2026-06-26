@@ -1,6 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
 import { useRef } from 'react';
-import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
+// Removed import of SecurityController (module not found). Use direct form action instead.
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import type { Props as ManagePasskeysProps } from '@/components/manage-passkeys';
@@ -10,7 +10,6 @@ import ManageTwoFactor from '@/components/manage-two-factor';
 import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { edit } from '@/routes/security';
 
 type Props = {
     passwordRules: string;
@@ -35,7 +34,8 @@ export default function Security(props: Props) {
                 />
 
                 <Form
-                    {...SecurityController.update.form()}
+                    action="/settings/security"
+                    method="post"
                     options={{
                         preserveScroll: true,
                     }}
@@ -49,7 +49,6 @@ export default function Security(props: Props) {
                         if (errors.password) {
                             passwordInput.current?.focus();
                         }
-
                         if (errors.current_password) {
                             currentPasswordInput.current?.focus();
                         }
@@ -59,10 +58,7 @@ export default function Security(props: Props) {
                     {({ errors, processing }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="current_password">
-                                    Current password
-                                </Label>
-
+                                <Label htmlFor="current_password">Current password</Label>
                                 <PasswordInput
                                     id="current_password"
                                     ref={currentPasswordInput}
@@ -71,13 +67,11 @@ export default function Security(props: Props) {
                                     autoComplete="current-password"
                                     placeholder="Current password"
                                 />
-
                                 <InputError message={errors.current_password} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="password">New password</Label>
-
                                 <PasswordInput
                                     id="password"
                                     ref={passwordInput}
@@ -87,15 +81,11 @@ export default function Security(props: Props) {
                                     placeholder="New password"
                                     passwordrules={props.passwordRules}
                                 />
-
                                 <InputError message={errors.password} />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirm password
-                                </Label>
-
+                                <Label htmlFor="password_confirmation">Confirm password</Label>
                                 <PasswordInput
                                     id="password_confirmation"
                                     name="password_confirmation"
@@ -104,17 +94,11 @@ export default function Security(props: Props) {
                                     placeholder="Confirm password"
                                     passwordrules={props.passwordRules}
                                 />
-
-                                <InputError
-                                    message={errors.password_confirmation}
-                                />
+                                <InputError message={errors.password_confirmation} />
                             </div>
 
                             <div className="flex items-center gap-4">
-                                <Button
-                                    disabled={processing}
-                                    data-test="update-password-button"
-                                >
+                                <Button disabled={processing} data-test="update-password-button">
                                     Save
                                 </Button>
                             </div>
@@ -141,7 +125,7 @@ Security.layout = {
     breadcrumbs: [
         {
             title: 'Security settings',
-            href: edit(),
+            href: '/settings/security',
         },
     ],
 };
