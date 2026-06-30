@@ -29,10 +29,7 @@ RUN npm install && npm run build
 
 RUN touch database/database.sqlite
 
-RUN php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache \
-    && (php artisan storage:link || true)
+RUN (php artisan storage:link || true)
 
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
@@ -42,4 +39,4 @@ COPY docker/supervisord.conf /etc/supervisord.conf
 
 EXPOSE 80
 
-CMD php artisan migrate --force && supervisord -c /etc/supervisord.conf
+CMD php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan migrate --force && supervisord -c /etc/supervisord.conf
