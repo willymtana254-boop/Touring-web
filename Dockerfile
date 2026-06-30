@@ -1,24 +1,53 @@
-FROM richarvey/nginx-php-fpm:php8.3-latest
+FROM php:8.3-fpm-alpine AS base
 
+# Install system dependencies, nginx, supervisor, Node, and PHP extensions
+RUN apk add --no-cache \
+    nginx \
+    supervisor \
+    curl \
+    git \
+    unzip \
+    sqlite \
+    sqlite-dev \
+    libpng-dev \
+    libxml2-dev \
+    oniguruma-dev \
+    zip \
+    bash \
+    nodejs \
+    npm \
+    && docker-php-ext-install pdo pdo_sqlite mbstring exif pcntl bcmath gd
+
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+# Copy application code
 COPY . .
 
-ENV SKIP_COMPOSER 1
-ENV WEBROOT /var/www/html/public
-ENV PHP_ERRORS_STDERR 1
-ENV RUN_SCRIPTS 1
-ENV REAL_IP_HEADER 1
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-ENV APP_ENV production
-ENV APP_DEBUG false
-ENV LOG_CHANNEL stderr
+# Install Node dependencies and build frontend assets
+RUN npm install && npm run build
 
-ENV COMPOSER_ALLOW_SUPERUSER 1
+# Laravel setup (cache config/routes/views, link storage)
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache \
+    && (php artisan storage:link || true)
 
-USER root
-RUN apk update && apk add --no-cache curl && \
-    curl -fsSL https://unofficial-builds.nodejs.org/download/release/v20.18.1/node-v20.18.1-linux-x64-musl.tar.xz -o node.tar.xz && \
-    tar -xJf node.tar.xz -C /usr/local --strip-components=1 && \
-    rm node.tar.xz && \
-    node -v && npm -v
+# Permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-CMD ["/start.sh"]
+# Nginx config
+COPY docker/nginx.conf /etc/nginx/http.d/default.conf
+
+# Supervisor config (runs nginx + php-fpm together)
+COPY docker/supervisord.conf /etc/supervisord.conf
+
+EXPOSE 80
+
+CMD php artisan migrate --force; supervisord -c /etc/supervisord.conf
