@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\Admin\BookingAdminController;
 use App\Http\Controllers\PageController;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------

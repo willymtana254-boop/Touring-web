@@ -13,15 +13,17 @@ createInertiaApp({
     layout: (name) => {
     switch (true) {
         case name === 'home':
+        case name === 'about':
         case name.startsWith('admin/'):   // ← add this
-    return null;
+            return null;
         case name.startsWith('auth/'):
             return AuthLayout;
         case name.startsWith('settings/'):
             return [AppLayout, SettingsLayout];
         default:
             return AppLayout;
-    }
+            
+        }
 },
     strictMode: true,
     withApp(app) {

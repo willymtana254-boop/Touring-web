@@ -77,15 +77,15 @@ const destinations = [
 ];
 
 const fares = [
-    { from: 'Mombasa',      to: 'Kilifi Town',         saloon: 'KSh 4,500',  van: 'KSh 7,000'  },
-    { from: 'Mombasa',      to: 'Watamu / Malindi',    saloon: 'KSh 7,500',  van: 'KSh 12,000' },
-    { from: 'Mombasa',      to: 'Diani Beach (Kwale)', saloon: 'KSh 3,500',  van: 'KSh 5,500'  },
-    { from: 'Mombasa',      to: 'Lamu (via road)',     saloon: 'KSh 18,000', van: 'KSh 28,000' },
-    { from: 'Mombasa',      to: 'Voi / Tsavo',        saloon: 'KSh 9,000',  van: 'KSh 14,500' },
-    { from: 'Kilifi',       to: 'Watamu / Malindi',    saloon: 'KSh 4,000',  van: 'KSh 6,500'  },
-    { from: 'Kilifi',       to: 'Diani Beach (Kwale)', saloon: 'KSh 7,500',  van: 'KSh 12,000' },
-    { from: 'Malindi',      to: 'Lamu (via road)',     saloon: 'KSh 12,000', van: 'KSh 19,000' },
-    { from: 'Diani (Kwale)', to: 'Taita Hills / Voi',  saloon: 'KSh 11,000', van: 'KSh 17,000' },
+    { from: 'Mombasa',       to: 'Kilifi Town',         saloon: 'KSh 4,500',  van: 'KSh 7,000'  },
+    { from: 'Mombasa',       to: 'Watamu / Malindi',    saloon: 'KSh 7,500',  van: 'KSh 12,000' },
+    { from: 'Mombasa',       to: 'Diani Beach (Kwale)', saloon: 'KSh 3,500',  van: 'KSh 5,500'  },
+    { from: 'Mombasa',       to: 'Lamu (via road)',     saloon: 'KSh 18,000', van: 'KSh 28,000' },
+    { from: 'Mombasa',       to: 'Voi / Tsavo',         saloon: 'KSh 9,000',  van: 'KSh 14,500' },
+    { from: 'Kilifi',        to: 'Watamu / Malindi',    saloon: 'KSh 4,000',  van: 'KSh 6,500'  },
+    { from: 'Kilifi',        to: 'Diani Beach (Kwale)', saloon: 'KSh 7,500',  van: 'KSh 12,000' },
+    { from: 'Malindi',       to: 'Lamu (via road)',     saloon: 'KSh 12,000', van: 'KSh 19,000' },
+    { from: 'Diani (Kwale)', to: 'Taita Hills / Voi',   saloon: 'KSh 11,000', van: 'KSh 17,000' },
 ];
 
 const testimonials = [
@@ -101,6 +101,15 @@ const testimonials = [
         initials: 'FK', name: 'Fatuma K.', trip: 'Mombasa → Tsavo Package',
         text: 'We booked a three-day Taita Hills and Tsavo package. Accommodation, transport, and guided game drive — all arranged in one WhatsApp conversation. Remarkable.',
     },
+];
+
+// ── Nav links ─────────────────────────────────────────────────────────────────
+const navLinks: [string, string][] = [
+    ['#destinations',  'Destinations'],
+    ['#transport',     'Transport'],
+    ['#how-it-works',  'How It Works'],
+    ['#reviews',       'Reviews'],
+    ['/about',         'About Us'],
 ];
 
 // ── Shared styles ─────────────────────────────────────────────────────────────
@@ -129,7 +138,6 @@ const inputStyle: React.CSSProperties = {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function Home() {
-    // Modal state
     const [showModal,  setShowModal]  = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [submitted,  setSubmitted]  = useState(false);
@@ -139,19 +147,19 @@ export default function Home() {
         travel_date: '', vehicle_type: 'saloon', passengers: '1', notes: '',
     });
 
-    // CTA section quick-select state
+    const [menuOpen,   setMenuOpen]   = useState(false);
     const [fromCounty, setFromCounty] = useState('');
     const [toCounty,   setToCounty]   = useState('');
     const [travelDate, setTravelDate] = useState('');
+    const [scrolled,   setScrolled]   = useState(false);
 
-    // Nav scroll state
-    const [scrolled, setScrolled] = useState(false);
-
-    // Shuffle photos once on mount
     const assignedPhotos = useMemo(() => shufflePhotos(photoPool, destinations.length), []);
 
     useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 40);
+        const onScroll = () => {
+            setScrolled(window.scrollY > 40);
+            if (window.scrollY > 40) setMenuOpen(false);
+        };
         window.addEventListener('scroll', onScroll);
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
@@ -172,6 +180,7 @@ export default function Home() {
 
     function openModal() {
         setSubmitted(false);
+        setMenuOpen(false);
         setShowModal(true);
     }
 
@@ -179,6 +188,18 @@ export default function Home() {
         setShowModal(false);
         setSubmitted(false);
         setFormData({ full_name: '', phone: '', email: '', from_location: '', to_location: '', travel_date: '', vehicle_type: 'saloon', passengers: '1', notes: '' });
+    }
+
+    function handleFromCountyChange(e: React.ChangeEvent<HTMLSelectElement>) {
+        setFromCounty(e.currentTarget.value);
+    }
+
+    function handleToCountyChange(e: React.ChangeEvent<HTMLSelectElement>) {
+        setToCounty(e.currentTarget.value);
+    }
+
+    function handleTravelDateChange(e: React.ChangeEvent<HTMLInputElement>) {
+        setTravelDate(e.currentTarget.value);
     }
 
     return (
@@ -190,22 +211,46 @@ export default function Home() {
                 body { overflow-x: hidden; }
                 .playfair { font-family: 'Playfair Display', serif; }
 
-                .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+                .nav {
+                    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
                     display: flex; align-items: center; justify-content: space-between;
                     padding: 1rem 4%; transition: background 0.3s;
-                    border-bottom: 1px solid rgba(255,255,255,0.08); }
+                    border-bottom: 1px solid rgba(255,255,255,0.08);
+                }
                 .nav-scrolled { background: rgba(13,43,69,0.97) !important; }
+
+                @keyframes slideDown {
+                    from { opacity: 0; transform: translateY(-12px); }
+                    to   { opacity: 1; transform: translateY(0); }
+                }
+                .mobile-menu {
+                    display: none;
+                    position: fixed;
+                    top: 64px; left: 0; right: 0;
+                    background: rgba(13,43,69,0.98);
+                    backdrop-filter: blur(16px);
+                    z-index: 199;
+                    padding: 1.5rem 6%;
+                    border-bottom: 1px solid rgba(255,255,255,0.08);
+                    flex-direction: column;
+                    gap: 0;
+                    animation: slideDown 0.2s ease;
+                }
+                .mobile-menu.open { display: flex; }
 
                 @keyframes scrollPulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
                 @keyframes waPulse {
-                    0%   { box-shadow: 0 4px 20px rgba(37,211,102,0.45), 0 0 0 0   rgba(37,211,102,0.4); }
+                    0%   { box-shadow: 0 4px 20px rgba(37,211,102,0.45), 0 0 0 0    rgba(37,211,102,0.4); }
                     70%  { box-shadow: 0 4px 20px rgba(37,211,102,0.45), 0 0 0 14px rgba(37,211,102,0);   }
-                    100% { box-shadow: 0 4px 20px rgba(37,211,102,0.45), 0 0 0 0   rgba(37,211,102,0);   }
+                    100% { box-shadow: 0 4px 20px rgba(37,211,102,0.45), 0 0 0 0    rgba(37,211,102,0);   }
                 }
 
-                .dest-card { border-radius: 16px; overflow: hidden;
-                    border: 1px solid rgba(13,43,69,0.08); transition: transform 0.25s, box-shadow 0.25s;
-                    background: #fff; cursor: pointer; }
+                .dest-card {
+                    border-radius: 16px; overflow: hidden;
+                    border: 1px solid rgba(13,43,69,0.08);
+                    transition: transform 0.25s, box-shadow 0.25s;
+                    background: #fff; cursor: pointer;
+                }
                 .dest-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(13,43,69,0.12); }
 
                 .card-photo { width: 100%; height: 200px; object-fit: cover; display: block; }
@@ -220,11 +265,14 @@ export default function Home() {
 
                 .price-row:hover td { background: rgba(255,255,255,0.04); }
 
-                .step-card { background: #fff; border-radius: 16px; padding: 2rem 1.5rem;
-                    border: 1px solid rgba(13,43,69,0.06); }
-
-                .t-card { background: #EAF3F0; border-radius: 16px; padding: 1.8rem;
-                    border: 1px solid rgba(45,106,79,0.1); }
+                .step-card {
+                    background: #fff; border-radius: 16px; padding: 2rem 1.5rem;
+                    border: 1px solid rgba(13,43,69,0.06);
+                }
+                .t-card {
+                    background: #EAF3F0; border-radius: 16px; padding: 1.8rem;
+                    border: 1px solid rgba(45,106,79,0.1);
+                }
 
                 .book-input, .book-select {
                     flex: 1; min-width: 160px; padding: 0.85rem 1.2rem; border-radius: 2rem;
@@ -243,6 +291,7 @@ export default function Home() {
 
                 @media (max-width: 768px) {
                     .nav-links { display: none !important; }
+                    .hamburger { display: flex !important; }
                     .footer-grid { grid-template-columns: 1fr 1fr !important; }
                     .stats-strip { flex-wrap: wrap; }
                     .stat { min-width: 120px; border-right: none !important; border-bottom: 1px solid rgba(13,43,69,0.1); padding: 1rem; }
@@ -257,24 +306,87 @@ export default function Home() {
             {/* ── NAV ── */}
             <nav className={`nav${scrolled ? ' nav-scrolled' : ''}`}
                 style={{ background: scrolled ? undefined : 'rgba(13,43,69,0.92)', backdropFilter: 'blur(12px)' }}>
-                <div className="playfair" style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>
+
+                <a href="/" className="playfair"
+                    style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', textDecoration: 'none' }}>
                     Bahari<span style={{ color: '#E8633A' }}>.</span>Tours
-                </div>
+                </a>
+
                 <ul className="nav-links" style={{ display: 'flex', gap: '2rem', listStyle: 'none' }}>
-                    {['Destinations', 'Transport', 'How It Works', 'Reviews'].map(l => (
-                        <li key={l}>
-                            <a href={`#${l.toLowerCase().replace(/\s+/g, '-')}`}
+                    {navLinks.map(([href, label]) => (
+                        <li key={label}>
+                            <a href={href}
                                 style={{ color: 'rgba(255,255,255,0.78)', fontSize: '0.875rem', textDecoration: 'none', letterSpacing: '0.04em' }}>
-                                {l}
+                                {label}
                             </a>
                         </li>
                     ))}
                 </ul>
-                <button onClick={openModal} className="btn-primary"
-                    style={{ background: '#E8633A', color: '#fff', padding: '0.55rem 1.4rem', borderRadius: '2rem', fontSize: '0.875rem', fontWeight: 600, border: 'none', cursor: 'pointer', transition: 'all 0.2s' }}>
-                    Book a Trip
-                </button>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <button onClick={openModal} className="btn-primary"
+                        style={{ background: '#E8633A', color: '#fff', padding: '0.55rem 1.4rem', borderRadius: '2rem', fontSize: '0.875rem', fontWeight: 600, border: 'none', cursor: 'pointer', transition: 'all 0.2s' }}>
+                        Book a Trip
+                    </button>
+
+                    <button
+                        className="hamburger"
+                        onClick={() => setMenuOpen(o => !o)}
+                        aria-label="Toggle navigation menu"
+                        style={{
+                            display: 'none', flexDirection: 'column', justifyContent: 'center',
+                            alignItems: 'center', gap: 5, background: 'none', border: 'none',
+                            cursor: 'pointer', padding: '0.25rem', width: 36, height: 36,
+                        }}
+                    >
+                        <span style={{ display: 'block', width: 22, height: 2, background: '#fff', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none' }} />
+                        <span style={{ display: 'block', width: 22, height: 2, background: '#fff', borderRadius: 2, transition: 'all 0.25s', opacity: menuOpen ? 0 : 1 }} />
+                        <span style={{ display: 'block', width: 22, height: 2, background: '#fff', borderRadius: 2, transition: 'all 0.25s', transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none' }} />
+                    </button>
+                </div>
             </nav>
+
+            {/* ── MOBILE MENU ── */}
+            <div className={`mobile-menu${menuOpen ? ' open' : ''}`}>
+                {navLinks.map(([href, label], i) => (
+                    <a
+                        key={label}
+                        href={href}
+                        onClick={() => setMenuOpen(false)}
+                        style={{
+                            color: 'rgba(255,255,255,0.85)',
+                            fontSize: '1rem',
+                            fontWeight: 500,
+                            textDecoration: 'none',
+                            padding: '1rem 0',
+                            borderBottom: i < navLinks.length - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none',
+                            letterSpacing: '0.02em',
+                            display: 'block',
+                        }}
+                    >
+                        {label}
+              </a>
+                 ))}
+                  <button
+                    onClick={openModal}
+                    style={{ marginTop: '1.25rem', width: '100%', background: '#E8633A', color: '#fff', border: 'none', padding: '0.85rem', borderRadius: '2rem', fontSize: '0.95rem', fontWeight: 700, cursor: 'pointer' }}
+                 >
+                    Book a Trip
+                   </button>
+                
+                <a
+                    href={whatsappBase}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setMenuOpen(false)}
+                    style={{ marginTop: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: '#7BC8B2', fontSize: '0.875rem', fontWeight: 600, textDecoration: 'none', padding: '0.5rem 0 1rem' }}
+                >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    Chat on WhatsApp
+                </a>
+            </div>
 
             {/* ── HERO ── */}
             <section style={{ position: 'relative', height: '100vh', minHeight: 620, display: 'flex', alignItems: 'center', background: '#0D2B45', overflow: 'hidden' }}>
@@ -287,7 +399,6 @@ export default function Home() {
                     <path d="M0,100 C240,160 480,40 720,100 C960,160 1200,40 1440,100 L1440,200 L0,200 Z" fill="white" />
                     <path d="M0,140 C240,180 480,80 720,140 C960,180 1200,80 1440,140 L1440,200 L0,200 Z" fill="white" opacity="0.5" />
                 </svg>
-
                 <div style={{ position: 'relative', zIndex: 2, padding: '0 4%', maxWidth: 680, marginTop: '4rem' }}>
                     <div style={{ display: 'inline-block', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#E8633A', marginBottom: '1.2rem', borderLeft: '3px solid #E8633A', paddingLeft: '0.75rem' }}>
                         Kenya's Coastal Explorer
@@ -309,7 +420,6 @@ export default function Home() {
                         </a>
                     </div>
                 </div>
-
                 <div style={{ position: 'absolute', bottom: '2.5rem', left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', zIndex: 2 }}>
                     <div style={{ width: 1, height: 48, background: 'linear-gradient(to bottom, rgba(255,255,255,0.4), transparent)', animation: 'scrollPulse 2s ease-in-out infinite' }} />
                     Scroll
@@ -455,15 +565,15 @@ export default function Home() {
                         Tell us where you're heading and we'll get back to you with options, pricing, and availability — usually within the hour.
                     </p>
                     <div style={{ display: 'flex', gap: '0.75rem', maxWidth: 680, margin: '0 auto', flexWrap: 'wrap', justifyContent: 'center' }}>
-                        <select className="book-select" value={fromCounty} onChange={e => setFromCounty(e.target.value)}>
+                        <select className="book-select" value={fromCounty} onChange={handleFromCountyChange}>
                             <option value="" disabled>From (County)</option>
                             {['Mombasa', 'Kilifi', 'Kwale / Diani', 'Lamu', 'Malindi', 'Taita Taveta'].map(c => <option key={c}>{c}</option>)}
                         </select>
-                        <select className="book-select" value={toCounty} onChange={e => setToCounty(e.target.value)}>
+                        <select className="book-select" value={toCounty} onChange={handleToCountyChange}>
                             <option value="" disabled>To (Destination)</option>
                             {['Kilifi / Watamu', 'Mombasa City', 'Diani Beach', 'Lamu Old Town', 'Malindi', 'Tsavo / Taita Hills'].map(c => <option key={c}>{c}</option>)}
                         </select>
-                        <input className="book-input" type="date" value={travelDate} onChange={e => setTravelDate(e.target.value)} style={{ flex: 1, minWidth: 160 }} />
+                        <input className="book-input" type="date" value={travelDate} onChange={handleTravelDateChange} style={{ flex: 1, minWidth: 160 }} />
                         <a href={`${whatsappBase}?text=${bookingMsg}`} target="_blank" rel="noreferrer" className="book-btn"
                             style={{ background: '#E8633A', color: '#fff', padding: '0.85rem 2.2rem', borderRadius: '2rem', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 4px 20px rgba(232,99,58,0.5)', whiteSpace: 'nowrap' }}>
                             Book Now →
@@ -495,22 +605,26 @@ export default function Home() {
                             <ul style={{ listStyle: 'none' }}>
                                 {col.links.map(l => (
                                     <li key={l} style={{ marginBottom: '0.5rem' }}>
-                                        <a href="#" style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.875rem', textDecoration: 'none' }}>{l}</a>
+                                        <a
+                                            href={l === 'About Us' ? '/about' : l === 'WhatsApp Us' ? whatsappBase : '#'}
+                                            target={l === 'WhatsApp Us' ? '_blank' : undefined}
+                                            rel={l === 'WhatsApp Us' ? 'noreferrer' : undefined}
+                                            style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.875rem', textDecoration: 'none' }}
+                                        >
+                                            {l}
+                                        </a>
                                     </li>
                                 ))}
                             </ul>
                         </div>
                     ))}
                 </div>
-
-                {/* Footer bottom bar */}
                 <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', fontSize: '0.8rem' }}>
                     <span>© 2026 Bahari Tours & Adventures. All rights reserved.</span>
                     <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
                         {['Privacy Policy', 'Terms of Service', 'Booking Policy'].map(l => (
                             <a key={l} href="#" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none', fontSize: '0.825rem' }}>{l}</a>
                         ))}
-                        {/* ── Subtle admin link ── */}
                         <a href="/admin/bookings"
                             style={{ color: 'rgba(255,255,255,0.15)', textDecoration: 'none', fontSize: '0.75rem', letterSpacing: '0.06em' }}>
                             Admin
@@ -521,15 +635,10 @@ export default function Home() {
 
             {/* ── BOOKING MODAL ── */}
             {showModal && (
-                <div
-                    onClick={closeModal}
-                    style={{ position: 'fixed', inset: 0, background: 'rgba(13,43,69,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', backdropFilter: 'blur(4px)' }}
-                >
-                    <div
-                        onClick={e => e.stopPropagation()}
-                        style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 540, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 60px rgba(13,43,69,0.25)' }}
-                    >
-                        {/* Modal header */}
+                <div onClick={closeModal}
+                    style={{ position: 'fixed', inset: 0, background: 'rgba(13,43,69,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', backdropFilter: 'blur(4px)' }}>
+                    <div onClick={e => e.stopPropagation()}
+                        style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 540, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 60px rgba(13,43,69,0.25)' }}>
                         <div style={{ background: 'linear-gradient(135deg, #0D2B45, #2D6A4F)', padding: '1.75rem 2rem 1.5rem', borderRadius: '20px 20px 0 0', position: 'relative' }}>
                             <button onClick={closeModal}
                                 style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -538,7 +647,6 @@ export default function Home() {
                             <div className="playfair" style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff', marginBottom: '0.25rem' }}>Book Your Trip</div>
                             <div style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.65)' }}>Fill in your details and we'll confirm within the hour.</div>
                         </div>
-
                         <div style={{ padding: '1.75rem 2rem' }}>
                             {submitted ? (
                                 <div style={{ textAlign: 'center', padding: '2rem 0' }}>
@@ -613,9 +721,8 @@ export default function Home() {
             )}
 
             {/* ── WHATSAPP FLOAT ── */}
-            
             <a
-                href="https://wa.me/254728769798"
+                href={whatsappBase}
                 target="_blank"
                 rel="noreferrer"
                 title="Chat with us on WhatsApp"
@@ -634,8 +741,8 @@ export default function Home() {
                     animation: 'waPulse 2s ease-in-out infinite',
                     transition: 'transform 0.2s',
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1.1)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1)'; }}
+                onMouseEnter={(e: any) => { (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1.1)'; }}
+                onMouseLeave={(e: any) => { (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1)'; }}
             >
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
