@@ -26,8 +26,6 @@ Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 
 // Booking
 Route::get('/book', [BookingController::class, 'create'])->name('booking.create');
-Route::post('/book', [BookingController::class, 'store'])->name('booking.store');
-Route::get('/book/confirmation/{reference}', [BookingController::class, 'confirmation'])->name('booking.confirmation');
 
 // Admin panel (protected by auth)
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {

@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { router } from '@inertiajs/react';
 
 // ── Photo pool ───────────────────────────────────────────────────────────────
 const photoPool = [
@@ -105,12 +104,19 @@ const testimonials = [
 
 // ── Nav links ─────────────────────────────────────────────────────────────────
 const navLinks: [string, string][] = [
-    ['#destinations',  'Destinations'],
-    ['#transport',     'Transport'],
-    ['#how-it-works',  'How It Works'],
-    ['#reviews',       'Reviews'],
-    ['/about',         'About Us'],
+    ['#destinations', 'Destinations'],
+    ['#transport',    'Transport'],
+    ['#how-it-works', 'How It Works'],
+    ['#reviews',      'Reviews'],
+    ['/about',        'About Us'],
 ];
+
+// ── WhatsApp SVG icon ─────────────────────────────────────────────────────────
+const WaIcon = ({ size = 20, color = '#fff' }: { size?: number; color?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+    </svg>
+);
 
 // ── Shared styles ─────────────────────────────────────────────────────────────
 const labelStyle: React.CSSProperties = {
@@ -139,8 +145,6 @@ const inputStyle: React.CSSProperties = {
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function Home() {
     const [showModal,  setShowModal]  = useState(false);
-    const [submitting, setSubmitting] = useState(false);
-    const [submitted,  setSubmitted]  = useState(false);
     const [formData,   setFormData]   = useState({
         full_name: '', phone: '', email: '',
         from_location: '', to_location: '',
@@ -169,37 +173,40 @@ export default function Home() {
         `Hi, I'd like to book a trip with Bahari Tours.\nFrom: ${fromCounty || '?'}\nTo: ${toCounty || '?'}\nDate: ${travelDate || '?'}`
     );
 
+    // ── Build formatted WhatsApp message from modal form ──────────────────────
     function handleBookingSubmit(e: React.FormEvent) {
         e.preventDefault();
-        setSubmitting(true);
-        router.post('/bookings', formData, {
-            onSuccess: () => { setSubmitted(true);  setSubmitting(false); },
-            onError:   () => { setSubmitting(false); },
-        });
+
+        const lines = [
+            `🌊 *New Booking Request — Bahari Tours*`,
+            ``,
+            `👤 *Name:* ${formData.full_name}`,
+            `📞 *Phone:* ${formData.phone}`,
+            formData.email ? `📧 *Email:* ${formData.email}` : null,
+            ``,
+            `📍 *From:* ${formData.from_location}`,
+            `📍 *To:* ${formData.to_location}`,
+            `📅 *Date:* ${formData.travel_date}`,
+            `🚗 *Vehicle:* ${formData.vehicle_type === 'saloon' ? 'Saloon / 7-Seater' : '14-Seater Van'}`,
+            `👥 *Passengers:* ${formData.passengers}`,
+            formData.notes ? `📝 *Notes:* ${formData.notes}` : null,
+        ].filter(Boolean).join('\n');
+
+        const url = `${whatsappBase}?text=${encodeURIComponent(lines)}`;
+        window.open(url, '_blank');
+
+        setShowModal(false);
+        setFormData({ full_name: '', phone: '', email: '', from_location: '', to_location: '', travel_date: '', vehicle_type: 'saloon', passengers: '1', notes: '' });
     }
 
     function openModal() {
-        setSubmitted(false);
         setMenuOpen(false);
         setShowModal(true);
     }
 
     function closeModal() {
         setShowModal(false);
-        setSubmitted(false);
         setFormData({ full_name: '', phone: '', email: '', from_location: '', to_location: '', travel_date: '', vehicle_type: 'saloon', passengers: '1', notes: '' });
-    }
-
-    function handleFromCountyChange(e: React.ChangeEvent<HTMLSelectElement>) {
-        setFromCounty(e.currentTarget.value);
-    }
-
-    function handleToCountyChange(e: React.ChangeEvent<HTMLSelectElement>) {
-        setToCounty(e.currentTarget.value);
-    }
-
-    function handleTravelDateChange(e: React.ChangeEvent<HTMLInputElement>) {
-        setTravelDate(e.currentTarget.value);
     }
 
     return (
@@ -288,6 +295,7 @@ export default function Home() {
                 .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
                 .btn-ghost:hover   { background: rgba(255,255,255,0.08) !important; }
                 .book-btn:hover    { opacity: 0.9; transform: translateY(-2px); }
+                .wa-submit-btn:hover { opacity: 0.9; transform: translateY(-2px); }
 
                 @media (max-width: 768px) {
                     .nav-links { display: none !important; }
@@ -365,25 +373,15 @@ export default function Home() {
                         }}
                     >
                         {label}
-              </a>
-                 ))}
-                  <button
-                    onClick={openModal}
-                    style={{ marginTop: '1.25rem', width: '100%', background: '#E8633A', color: '#fff', border: 'none', padding: '0.85rem', borderRadius: '2rem', fontSize: '0.95rem', fontWeight: 700, cursor: 'pointer' }}
-                 >
+                    </a>
+                ))}
+                <button onClick={openModal}
+                    style={{ marginTop: '1.25rem', width: '100%', background: '#E8633A', color: '#fff', border: 'none', padding: '0.85rem', borderRadius: '2rem', fontSize: '0.95rem', fontWeight: 700, cursor: 'pointer' }}>
                     Book a Trip
-                   </button>
-                
-                <a
-                    href={whatsappBase}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => setMenuOpen(false)}
-                    style={{ marginTop: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: '#7BC8B2', fontSize: '0.875rem', fontWeight: 600, textDecoration: 'none', padding: '0.5rem 0 1rem' }}
-                >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                    </svg>
+                </button>
+                <a href={whatsappBase} target="_blank" rel="noreferrer" onClick={() => setMenuOpen(false)}
+                    style={{ marginTop: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: '#7BC8B2', fontSize: '0.875rem', fontWeight: 600, textDecoration: 'none', padding: '0.5rem 0 1rem' }}>
+                    <WaIcon size={16} color="#7BC8B2" />
                     Chat on WhatsApp
                 </a>
             </div>
@@ -565,26 +563,26 @@ export default function Home() {
                         Tell us where you're heading and we'll get back to you with options, pricing, and availability — usually within the hour.
                     </p>
                     <div style={{ display: 'flex', gap: '0.75rem', maxWidth: 680, margin: '0 auto', flexWrap: 'wrap', justifyContent: 'center' }}>
-                        <select className="book-select" value={fromCounty} onChange={handleFromCountyChange}>
+                        <select className="book-select" value={fromCounty} onChange={e => setFromCounty(e.target.value)}>
                             <option value="" disabled>From (County)</option>
                             {['Mombasa', 'Kilifi', 'Kwale / Diani', 'Lamu', 'Malindi', 'Taita Taveta'].map(c => <option key={c}>{c}</option>)}
                         </select>
-                        <select className="book-select" value={toCounty} onChange={handleToCountyChange}>
+                        <select className="book-select" value={toCounty} onChange={e => setToCounty(e.target.value)}>
                             <option value="" disabled>To (Destination)</option>
                             {['Kilifi / Watamu', 'Mombasa City', 'Diani Beach', 'Lamu Old Town', 'Malindi', 'Tsavo / Taita Hills'].map(c => <option key={c}>{c}</option>)}
                         </select>
-                        <input className="book-input" type="date" value={travelDate} onChange={handleTravelDateChange} style={{ flex: 1, minWidth: 160 }} />
+                        <input className="book-input" type="date" value={travelDate} onChange={e => setTravelDate(e.target.value)} style={{ flex: 1, minWidth: 160 }} />
                         <a href={`${whatsappBase}?text=${bookingMsg}`} target="_blank" rel="noreferrer" className="book-btn"
-                            style={{ background: '#E8633A', color: '#fff', padding: '0.85rem 2.2rem', borderRadius: '2rem', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 4px 20px rgba(232,99,58,0.5)', whiteSpace: 'nowrap' }}>
-                            Book Now →
+                            style={{ background: '#25D366', color: '#fff', padding: '0.85rem 2.2rem', borderRadius: '2rem', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 4px 20px rgba(37,211,102,0.4)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <WaIcon size={18} />
+                            Book via WhatsApp
                         </a>
                     </div>
-                    <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', margin: '1.5rem 0 0.75rem' }}>— or —</div>
-                    <a href={whatsappBase} target="_blank" rel="noreferrer"
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: '#7BC8B2', fontWeight: 600, fontSize: '0.9rem', textDecoration: 'none' }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
-                        Chat us on WhatsApp instead
-                    </a>
+                    <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', margin: '1.5rem 0 0.75rem' }}>— or fill in a detailed form —</div>
+                    <button onClick={openModal}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'none', border: '1.5px solid rgba(255,255,255,0.3)', color: '#fff', padding: '0.7rem 1.8rem', borderRadius: '2rem', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer' }}>
+                        Open Booking Form
+                    </button>
                 </div>
             </section>
 
@@ -625,8 +623,7 @@ export default function Home() {
                         {['Privacy Policy', 'Terms of Service', 'Booking Policy'].map(l => (
                             <a key={l} href="#" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none', fontSize: '0.825rem' }}>{l}</a>
                         ))}
-                        <a href="/admin/bookings"
-                            style={{ color: 'rgba(255,255,255,0.15)', textDecoration: 'none', fontSize: '0.75rem', letterSpacing: '0.06em' }}>
+                        <a href="/admin/bookings" style={{ color: 'rgba(255,255,255,0.15)', textDecoration: 'none', fontSize: '0.75rem', letterSpacing: '0.06em' }}>
                             Admin
                         </a>
                     </div>
@@ -639,82 +636,105 @@ export default function Home() {
                     style={{ position: 'fixed', inset: 0, background: 'rgba(13,43,69,0.75)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', backdropFilter: 'blur(4px)' }}>
                     <div onClick={e => e.stopPropagation()}
                         style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 540, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 60px rgba(13,43,69,0.25)' }}>
+
+                        {/* Modal header */}
                         <div style={{ background: 'linear-gradient(135deg, #0D2B45, #2D6A4F)', padding: '1.75rem 2rem 1.5rem', borderRadius: '20px 20px 0 0', position: 'relative' }}>
                             <button onClick={closeModal}
                                 style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 ✕
                             </button>
                             <div className="playfair" style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff', marginBottom: '0.25rem' }}>Book Your Trip</div>
-                            <div style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.65)' }}>Fill in your details and we'll confirm within the hour.</div>
+                            <div style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.65)' }}>Fill in your details and send directly to our WhatsApp.</div>
                         </div>
+
+                        {/* Modal form */}
                         <div style={{ padding: '1.75rem 2rem' }}>
-                            {submitted ? (
-                                <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-                                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✅</div>
-                                    <div className="playfair" style={{ fontSize: '1.3rem', fontWeight: 700, color: '#0D2B45', marginBottom: '0.5rem' }}>Booking Received!</div>
-                                    <p style={{ color: '#5A6472', fontSize: '0.9rem', lineHeight: 1.7, marginBottom: '1.5rem' }}>
-                                        Thank you! Our team will reach out to you on WhatsApp or phone shortly to confirm your trip.
-                                    </p>
-                                    <button onClick={closeModal}
-                                        style={{ background: '#E8633A', color: '#fff', border: 'none', padding: '0.75rem 2rem', borderRadius: '2rem', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem' }}>
-                                        Close
-                                    </button>
-                                </div>
-                            ) : (
-                                <form onSubmit={handleBookingSubmit}>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                                        <div style={{ gridColumn: '1 / -1' }}>
-                                            <label style={labelStyle}>Full Name *</label>
-                                            <input style={inputStyle} type="text" placeholder="e.g. Amina Mohamed" required value={formData.full_name} onChange={e => setFormData(p => ({ ...p, full_name: e.target.value }))} />
-                                        </div>
-                                        <div>
-                                            <label style={labelStyle}>Phone *</label>
-                                            <input style={inputStyle} type="tel" placeholder="07XX XXX XXX" required value={formData.phone} onChange={e => setFormData(p => ({ ...p, phone: e.target.value }))} />
-                                        </div>
-                                        <div>
-                                            <label style={labelStyle}>Email</label>
-                                            <input style={inputStyle} type="email" placeholder="Optional" value={formData.email} onChange={e => setFormData(p => ({ ...p, email: e.target.value }))} />
-                                        </div>
-                                        <div>
-                                            <label style={labelStyle}>From *</label>
-                                            <select style={inputStyle} required value={formData.from_location} onChange={e => setFormData(p => ({ ...p, from_location: e.target.value }))}>
-                                                <option value="">Select county</option>
-                                                {['Mombasa', 'Kilifi', 'Kwale / Diani', 'Lamu', 'Malindi', 'Taita Taveta'].map(c => <option key={c}>{c}</option>)}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label style={labelStyle}>To *</label>
-                                            <select style={inputStyle} required value={formData.to_location} onChange={e => setFormData(p => ({ ...p, to_location: e.target.value }))}>
-                                                <option value="">Select destination</option>
-                                                {['Kilifi / Watamu', 'Mombasa City', 'Diani Beach', 'Lamu Old Town', 'Malindi', 'Tsavo / Taita Hills'].map(c => <option key={c}>{c}</option>)}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label style={labelStyle}>Travel Date *</label>
-                                            <input style={inputStyle} type="date" required value={formData.travel_date} onChange={e => setFormData(p => ({ ...p, travel_date: e.target.value }))} />
-                                        </div>
-                                        <div>
-                                            <label style={labelStyle}>Vehicle</label>
-                                            <select style={inputStyle} value={formData.vehicle_type} onChange={e => setFormData(p => ({ ...p, vehicle_type: e.target.value }))}>
-                                                <option value="saloon">Saloon / 7-Seater</option>
-                                                <option value="van">14-Seater Van</option>
-                                            </select>
-                                        </div>
-                                        <div style={{ gridColumn: '1 / -1' }}>
-                                            <label style={labelStyle}>Passengers</label>
-                                            <input style={inputStyle} type="number" min={1} max={14} value={formData.passengers} onChange={e => setFormData(p => ({ ...p, passengers: e.target.value }))} />
-                                        </div>
-                                        <div style={{ gridColumn: '1 / -1' }}>
-                                            <label style={labelStyle}>Notes</label>
-                                            <textarea style={{ ...inputStyle, resize: 'vertical', minHeight: 80 }} placeholder="Any special requests, pickup point, etc." value={formData.notes} onChange={e => setFormData(p => ({ ...p, notes: e.target.value }))} />
-                                        </div>
+                            <form onSubmit={handleBookingSubmit}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                    <div style={{ gridColumn: '1 / -1' }}>
+                                        <label style={labelStyle}>Full Name *</label>
+                                        <input style={inputStyle} type="text" placeholder="e.g. Amina Mohamed" required
+                                            value={formData.full_name} onChange={e => setFormData(p => ({ ...p, full_name: e.target.value }))} />
                                     </div>
-                                    <button type="submit" disabled={submitting}
-                                        style={{ width: '100%', background: submitting ? '#ccc' : '#E8633A', color: '#fff', border: 'none', padding: '0.9rem', borderRadius: '2rem', fontWeight: 700, fontSize: '1rem', cursor: submitting ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
-                                        {submitting ? 'Sending…' : 'Submit Booking →'}
-                                    </button>
-                                </form>
-                            )}
+                                    <div>
+                                        <label style={labelStyle}>Phone *</label>
+                                        <input style={inputStyle} type="tel" placeholder="07XX XXX XXX" required
+                                            value={formData.phone} onChange={e => setFormData(p => ({ ...p, phone: e.target.value }))} />
+                                    </div>
+                                    <div>
+                                        <label style={labelStyle}>Email</label>
+                                        <input style={inputStyle} type="email" placeholder="Optional"
+                                            value={formData.email} onChange={e => setFormData(p => ({ ...p, email: e.target.value }))} />
+                                    </div>
+                                    <div>
+                                        <label style={labelStyle}>From *</label>
+                                        <select style={inputStyle} required value={formData.from_location}
+                                            onChange={e => setFormData(p => ({ ...p, from_location: e.target.value }))}>
+                                            <option value="">Select county</option>
+                                            {['Mombasa', 'Kilifi', 'Kwale / Diani', 'Lamu', 'Malindi', 'Taita Taveta'].map(c => <option key={c}>{c}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style={labelStyle}>To *</label>
+                                        <select style={inputStyle} required value={formData.to_location}
+                                            onChange={e => setFormData(p => ({ ...p, to_location: e.target.value }))}>
+                                            <option value="">Select destination</option>
+                                            {['Kilifi / Watamu', 'Mombasa City', 'Diani Beach', 'Lamu Old Town', 'Malindi', 'Tsavo / Taita Hills'].map(c => <option key={c}>{c}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style={labelStyle}>Travel Date *</label>
+                                        <input style={inputStyle} type="date" required value={formData.travel_date}
+                                            onChange={e => setFormData(p => ({ ...p, travel_date: e.target.value }))} />
+                                    </div>
+                                    <div>
+                                        <label style={labelStyle}>Vehicle</label>
+                                        <select style={inputStyle} value={formData.vehicle_type}
+                                            onChange={e => setFormData(p => ({ ...p, vehicle_type: e.target.value }))}>
+                                            <option value="saloon">Saloon / 7-Seater</option>
+                                            <option value="van">14-Seater Van</option>
+                                        </select>
+                                    </div>
+                                    <div style={{ gridColumn: '1 / -1' }}>
+                                        <label style={labelStyle}>Passengers</label>
+                                        <input style={inputStyle} type="number" min={1} max={14}
+                                            value={formData.passengers} onChange={e => setFormData(p => ({ ...p, passengers: e.target.value }))} />
+                                    </div>
+                                    <div style={{ gridColumn: '1 / -1' }}>
+                                        <label style={labelStyle}>Notes</label>
+                                        <textarea style={{ ...inputStyle, resize: 'vertical', minHeight: 80 }}
+                                            placeholder="Any special requests, pickup point, etc."
+                                            value={formData.notes} onChange={e => setFormData(p => ({ ...p, notes: e.target.value }))} />
+                                    </div>
+                                </div>
+
+                                {/* WhatsApp submit button */}
+                                <button type="submit" className="wa-submit-btn"
+                                    style={{
+                                        width: '100%',
+                                        background: '#25D366',
+                                        color: '#fff',
+                                        border: 'none',
+                                        padding: '0.9rem',
+                                        borderRadius: '2rem',
+                                        fontWeight: 700,
+                                        fontSize: '1rem',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '0.6rem',
+                                        transition: 'all 0.2s',
+                                        boxShadow: '0 4px 16px rgba(37,211,102,0.35)',
+                                    }}>
+                                    <WaIcon size={20} />
+                                    Send Booking via WhatsApp
+                                </button>
+
+                                <p style={{ textAlign: 'center', fontSize: '0.75rem', color: '#94A3B8', marginTop: '0.75rem', lineHeight: 1.5 }}>
+                                    WhatsApp will open with your details pre-filled. Our team confirms within the hour.
+                                </p>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -741,12 +761,10 @@ export default function Home() {
                     animation: 'waPulse 2s ease-in-out infinite',
                     transition: 'transform 0.2s',
                 }}
-                onMouseEnter={(e: any) => { (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1.1)'; }}
-                onMouseLeave={(e: any) => { (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1)'; }}
+                onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => { (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1.1)'; }}
+                onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => { (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1)'; }}
             >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                </svg>
+                <WaIcon size={28} />
             </a>
         </div>
     );
