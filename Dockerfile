@@ -21,7 +21,7 @@ RUN npm install && npm run build
 RUN touch database/database.sqlite
 
 # Write .env directly
-RUN printf "APP_NAME=BahariTours\n\
+RUN printf "APP_NAME=Bah\n\
 APP_ENV=production\n\
 APP_KEY=\n\
 APP_DEBUG=false\n\

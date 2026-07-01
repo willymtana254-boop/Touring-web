@@ -16,7 +16,7 @@ type Booking = {
 
 export default function BookingConfirmation({ booking }: { booking: Booking }) {
     const waMsg = encodeURIComponent(
-        `Hi Bahari Tours, I just submitted a booking! 🌊\n\n` +
+        `Hi Biryaa Travels, I just submitted a booking! 🌊\n\n` +
         `📋 *Ref:* ${booking.reference}\n` +
         `👤 *Name:* ${booking.full_name}\n` +
         `📞 *Phone:* ${booking.phone}\n` +
@@ -30,7 +30,7 @@ export default function BookingConfirmation({ booking }: { booking: Booking }) {
 
     return (
         <>
-            <Head title="Booking Confirmed – Bahari Tours" />
+            <Head title="Booking Confirmed – Biryaa Travels" />
             <div style={{ minHeight: '100vh', background: '#F7F0E3', fontFamily: 'Inter, sans-serif' }}>
 
                 {/* Nav */}
@@ -43,7 +43,7 @@ export default function BookingConfirmation({ booking }: { booking: Booking }) {
                         fontFamily: 'Playfair Display, serif', fontSize: '1.4rem',
                         fontWeight: 900, color: '#fff', textDecoration: 'none',
                     }}>
-                        Bahari<span style={{ color: '#E8633A' }}>.</span>Tours
+                        Biryaa<span style={{ color: '#E8633A' }}>.</span>Travels
                     </a>
                     <a href="/" style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.875rem', textDecoration: 'none' }}>
                         ← Home

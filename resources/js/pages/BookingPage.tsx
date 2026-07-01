@@ -130,7 +130,7 @@ export default function BookingPage() {
     if (submitted) {
         return (
             <>
-                <Head title="Booking Confirmed – Bahari Tours" />
+                <Head title="Booking Confirmed – Biryaa Travels" />
                 <div style={styles.page}>
                     <Nav />
                     <div style={styles.confirmWrap}>
@@ -152,7 +152,7 @@ export default function BookingPage() {
                                 {estimatedPrice && <div style={styles.confirmRow}><span>Estimated Fare</span><strong style={{ color: '#E8633A' }}>{estimatedPrice}</strong></div>}
                             </div>
                             <a
-                                href={`https://wa.me/254700000000?text=Hi, I just booked with Bahari Tours. My reference is ${reference || 'BT-PENDING'}. Please confirm my trip from ${form.from_location} to ${form.to_location} on ${form.travel_date}.`}
+                                href={`https://wa.me/254700000000?text=Hi, I just booked with Biryaa Travels. My reference is ${reference || 'BT-PENDING'}. Please confirm my trip from ${form.from_location} to ${form.to_location} on ${form.travel_date}.`}
                                 target="_blank"
                                 rel="noreferrer"
                                 style={styles.waBtn}
@@ -171,13 +171,13 @@ export default function BookingPage() {
     // ── FORM ──
     return (
         <>
-            <Head title="Book a Trip – Bahari Tours" />
+            <Head title="Book a Trip – Biryaa Travels" />
             <div style={styles.page}>
                 <Nav />
                 <div style={styles.formWrap}>
                     {/* Header */}
                     <div style={styles.formHeader}>
-                        <div style={styles.eyebrow}>Bahari Tours & Adventures</div>
+                        <div style={styles.eyebrow}>Biryaa Travels & Adventures</div>
                         <h1 style={styles.formTitle}>Book Your Coastal Journey</h1>
                         <p style={styles.formSub}>Fill in the details below and we'll confirm your trip within the hour.</p>
                     </div>

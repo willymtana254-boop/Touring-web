@@ -170,7 +170,7 @@ export default function Home() {
 
     const whatsappBase = 'https://wa.me/254728769798';
     const bookingMsg = encodeURIComponent(
-        `Hi, I'd like to book a trip with Bahari Tours.\nFrom: ${fromCounty || '?'}\nTo: ${toCounty || '?'}\nDate: ${travelDate || '?'}`
+        `Hi, I'd like to book a trip with Biryaa Travels.\nFrom: ${fromCounty || '?'}\nTo: ${toCounty || '?'}\nDate: ${travelDate || '?'}`
     );
 
     // ── Build formatted WhatsApp message from modal form ──────────────────────
@@ -178,7 +178,7 @@ export default function Home() {
         e.preventDefault();
 
         const lines = [
-            `🌊 *New Booking Request — Bahari Tours*`,
+            `🌊 *New Booking Request — Biryaa Travels*`,
             ``,
             `👤 *Name:* ${formData.full_name}`,
             `📞 *Phone:* ${formData.phone}`,
@@ -596,7 +596,7 @@ export default function Home() {
                     {[
                         { title: 'Destinations', links: ['Kilifi & Watamu', 'Mombasa City', 'Diani Beach', 'Lamu Old Town', 'Malindi', 'Tsavo & Taita Hills'] },
                         { title: 'Company',      links: ['About Us', 'Our Vehicles', 'Packages', 'Travel Policies', 'FAQ'] },
-                        { title: 'Contact',      links: ['+254 728 769 798', 'hello@baharitourskenya.com', 'Kilifi Town, Kenya', 'WhatsApp Us'] },
+                        { title: 'Contact',      links: ['+254 728 769 798', 'hello@biryaatravelskenya.com', 'Kilifi Town, Kenya', 'WhatsApp Us'] },
                     ].map(col => (
                         <div key={col.title}>
                             <h4 style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#fff', marginBottom: '1rem' }}>{col.title}</h4>
@@ -618,7 +618,7 @@ export default function Home() {
                     ))}
                 </div>
                 <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', fontSize: '0.8rem' }}>
-                    <span>© 2026 Bahari Tours & Adventures. All rights reserved.</span>
+                    <span>© 2026 Biryaa Travels & Adventures. All rights reserved.</span>
                     <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
                         {['Privacy Policy', 'Terms of Service', 'Booking Policy'].map(l => (
                             <a key={l} href="#" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none', fontSize: '0.825rem' }}>{l}</a>

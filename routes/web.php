@@ -8,7 +8,7 @@ use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes – Bahari Tours & Adventures
+| Web Routes – Biryaa Travels & Adventures
 |--------------------------------------------------------------------------
 */
 

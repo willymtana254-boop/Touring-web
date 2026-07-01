@@ -140,13 +140,13 @@ export default function About() {
 
                 <div style={{ maxWidth: 680, position: 'relative', zIndex: 1 }}>
                     <div style={{ display: 'inline-block', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#E8633A', marginBottom: '1.2rem', borderLeft: '3px solid #E8633A', paddingLeft: '0.75rem' }}>
-                        About Bahari Tours
+                        About Biryaa Travels
                     </div>
                     <h1 className="playfair" style={{ fontSize: 'clamp(2.2rem,4.5vw,3.6rem)', fontWeight: 900, lineHeight: 1.1, color: '#fff', marginBottom: '1.4rem' }}>
                         We Know This Coast <em style={{ color: '#7BC8B2' }}>Like Home</em>
                     </h1>
                     <p style={{ fontSize: '1.05rem', lineHeight: 1.75, color: 'rgba(255,255,255,0.72)', maxWidth: 540 }}>
-                        Because it is. Bahari Tours was built by people who live, work, and travel along Kenya's six coastal counties every day — not by a corporate office somewhere inland.
+                        Because it is. Biryaa Travels was built by people who live, work, and travel along Kenya's six coastal counties every day — not by a corporate office somewhere inland.
                     </p>
                 </div>
             </section>
@@ -175,7 +175,7 @@ export default function About() {
                                 Born from the Coast, Built for the Coast
                             </h2>
                             <p style={{ fontSize: '0.975rem', color: '#5A6472', lineHeight: 1.8, marginBottom: '1.25rem' }}>
-                                Bahari Tours started with a simple frustration — visitors to Kenya's coast had no reliable way to travel between counties. Matatus were unpredictable, private hire was overpriced and opaque, and tour operators bundled transport into expensive packages that didn't fit what most travellers actually needed.
+                                Biryaa Travels started with a simple frustration — visitors to Kenya's coast had no reliable way to travel between counties. Matatus were unpredictable, private hire was overpriced and opaque, and tour operators bundled transport into expensive packages that didn't fit what most travellers actually needed.
                             </p>
                             <p style={{ fontSize: '0.975rem', color: '#5A6472', lineHeight: 1.8, marginBottom: '1.25rem' }}>
                                 We set out to fix that. One fixed price, one professional driver, one vehicle — whether you're moving a family of seven from Mombasa to Diani, or a solo traveller heading up to Lamu for a week. No middlemen, no surprises.
@@ -278,7 +278,7 @@ export default function About() {
                         <a href="/#transport" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none', fontSize: '0.85rem' }}>Transport</a>
                         <a href="https://wa.me/254728769798" target="_blank" rel="noreferrer" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none', fontSize: '0.85rem' }}>WhatsApp Us</a>
                     </div>
-                    <span>© 2026 Bahari Tours & Adventures.</span>
+                    <span>© 2026 Biryaa Travels & Adventures.</span>
                 </div>
             </footer>
         </div>
