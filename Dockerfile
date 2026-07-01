@@ -1,22 +1,9 @@
 FROM php:8.4-fpm-alpine AS base
 
 RUN apk add --no-cache \
-    nginx \
-    supervisor \
-    curl \
-    git \
-    unzip \
-    zip \
-    bash \
-    nodejs \
-    npm \
-    sqlite \
-    sqlite-dev \
-    sqlite-libs \
-    libpng-dev \
-    libxml2-dev \
-    oniguruma-dev \
-    pkgconfig \
+    nginx supervisor curl git unzip zip bash nodejs npm \
+    sqlite sqlite-dev sqlite-libs libpng-dev libxml2-dev \
+    oniguruma-dev pkgconfig \
     && SQLITE_CFLAGS="-I/usr/include" \
        SQLITE_LIBS="-L/usr/lib -lsqlite3" \
        docker-php-ext-install pdo pdo_sqlite mbstring exif pcntl bcmath gd
@@ -33,13 +20,22 @@ RUN npm install && npm run build
 
 RUN touch database/database.sqlite
 
+# ── Set correct APP_URL before caching config ──
+RUN cp .env.example .env && \
+    sed -i 's|APP_URL=http://localhost|APP_URL=https://touring-web-1.onrender.com|g' .env && \
+    sed -i 's|APP_ENV=local|APP_ENV=production|g' .env && \
+    sed -i 's|APP_DEBUG=true|APP_DEBUG=false|g' .env && \
+    sed -i 's|DB_CONNECTION=.*|DB_CONNECTION=sqlite|g' .env && \
+    echo "DB_DATABASE=/var/www/html/database/database.sqlite" >> .env
+
+RUN php artisan key:generate
 RUN php artisan config:cache \
     && php artisan route:cache \
     && php artisan view:cache \
     && (php artisan storage:link || true)
 
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
+RUN chown -R www-data:www-data storage bootstrap/cache database \
+    && chmod -R 775 storage bootstrap/cache database
 
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
