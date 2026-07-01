@@ -108,7 +108,7 @@ export default function About() {
             <nav className="nav">
                 <a href="/" className="playfair"
                     style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', textDecoration: 'none' }}>
-                    Bahari<span style={{ color: '#E8633A' }}>.</span>Tours
+                    Biryaa<span style={{ color: '#E8633A' }}>.</span>Travels
                 </a>
                 <ul className="nav-links" style={{ display: 'flex', gap: '2rem', listStyle: 'none' }}>
                     {[['/', 'Home'], ['/about', 'About'], ['/#destinations', 'Destinations'], ['/#transport', 'Transport']].map(([href, label]) => (
